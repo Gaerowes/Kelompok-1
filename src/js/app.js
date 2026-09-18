@@ -27,10 +27,20 @@ function renderTasks() {
 
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
-  if (tasks.length === 0) {
+  //fitur 3: render tasks
+  const filteredTasks = tasks.filter((task) => {
+    if (currentFilter === "active") return !task.completed;
+    if (currentFilter === "completed") return task.completed;
+    return true;
+  });
+
+  if (filteredTasks.length === 0) {
     const emptyState = document.createElement("li");
     emptyState.className = "empty-state";
-    emptyState.textContent = "Belum ada task. Tambahkan satu di atas!";
+    emptyState.textContent =
+      tasks.length === 0
+        ? "Belum ada task. Tambahkan satu di atas!"
+        : "Tidak ada task pada filter ini.";
     taskList.appendChild(emptyState);
     return;
   }
@@ -112,6 +122,20 @@ function deleteTask(id) {
 // `let currentFilter = "all";`, lalu tambahkan event listener untuk
 // setiap .filter-btn yang mengubah currentFilter dan memanggil
 // renderTasks() ulang.
+// Fitur #3 - Filter Task: event listener tombol filter
+const filterButtons = document.querySelectorAll(".filter-btn");
+
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+
+    // Tandai tombol yang aktif
+    filterButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    renderTasks();
+  });
+});
 
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
