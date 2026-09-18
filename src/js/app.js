@@ -15,13 +15,17 @@ let tasks = [];
 let nextId = 1;
 
 // TODO (Fitur #4 - Simpan ke localStorage):
-// Saat aplikasi pertama kali dibuka, load "tasks" dari localStorage
-// (kalau ada) sebelum renderTasks() dipanggil pertama kali di bawah.
-// Hint: gunakan JSON.parse(localStorage.getItem("tasks")) dan cek
-// null-nya sebelum dipakai.
+const savedTasks = localStorage.getItem("tasks");
+
+if (savedTasks !== null) {
+  tasks = JSON.parse(savedTasks);
+  nextId = Math.max(...tasks.map((task) => task.id), 0) + 1;
+}
 
 function renderTasks() {
   taskList.innerHTML = "";
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 
   if (tasks.length === 0) {
     const emptyState = document.createElement("li");
