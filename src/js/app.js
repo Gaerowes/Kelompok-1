@@ -40,15 +40,21 @@ function renderTasks() {
   // (semua / aktif / selesai). Sekarang semua task selalu ditampilkan.
   tasks.forEach((task) => {
     const li = document.createElement("li");
-    li.className = "task-item";
+    li.className = `task-item ${task.completed ? "completed" : ""}`;
     li.dataset.id = task.id;
 
     // TODO (Fitur #1 - Tandai Selesai):
     // Tambahkan <input type="checkbox"> di sini yang mencerminkan
     // task.completed, dan tambahkan class "completed" pada `li`
     // kalau task.completed === true.
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.className = "task-checkbox";
+    checkbox.addEventListener("change", () => toggleComplete(task.id));
 
     const span = document.createElement("span");
+    li.appendChild(checkbox);
     span.textContent = task.text;
 
     // TODO (Fitur #2 - Edit Task):
@@ -97,6 +103,15 @@ function deleteTask(id) {
 // TODO (Fitur #1 - Tandai Selesai):
 // Buat function toggleComplete(id) yang membalik nilai task.completed
 // untuk task dengan id yang cocok, lalu panggil renderTasks().
+function toggleComplete(id) {
+  tasks = tasks.map((task) => {
+    if (task.id === id) {
+      return { ...task, completed: !task.completed };
+    }
+    return task;
+  });
+  renderTasks();
+}
 
 // TODO (Fitur #2 - Edit Task):
 // Buat function editTask(id, newText) yang mengubah task.text
