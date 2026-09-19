@@ -75,6 +75,11 @@ function renderTasks() {
   // TODO (Fitur #5 - Counter):
   // Update elemen #task-counter di sini setiap kali renderTasks() dipanggil,
   // isinya jumlah task yang belum selesai. Contoh: "3 task tersisa".
+  const counter = document.getElementById("task-counter");
+  if (counter) {
+    const activeCount = tasks.filter((t) => !t.completed).length;
+    counter.textContent = `${activeCount} task tersisa`;
+  }
 
   // TODO (Fitur #4 - Simpan ke localStorage):
   // Setiap kali renderTasks() dipanggil, data "tasks" sudah berubah,
