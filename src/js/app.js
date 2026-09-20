@@ -13,6 +13,7 @@ const taskList = document.getElementById("task-list");
 // dipakai di mana pun. Itu tugas kamu di Fitur #1.
 let tasks = [];
 let nextId = 1;
+let currentFilter = "all";
 
 // TODO (Fitur #4 - Simpan ke localStorage):
 const savedTasks = localStorage.getItem("tasks");
@@ -34,6 +35,12 @@ function renderTasks() {
     return true;
   });
 
+  const counter = document.getElementById("task-counter");
+  if (counter) {
+    const activeCount = tasks.filter((t) => !t.completed).length;
+    counter.textContent = `${activeCount} task tersisa`;
+  }
+
   if (filteredTasks.length === 0) {
     const emptyState = document.createElement("li");
     emptyState.className = "empty-state";
@@ -48,7 +55,7 @@ function renderTasks() {
   // TODO (Fitur #3 - Filter Task):
   // Sebelum di-loop, filter dulu "tasks" sesuai filter aktif
   // (semua / aktif / selesai). Sekarang semua task selalu ditampilkan.
-  tasks.forEach((task) => {
+  filteredTasks.forEach((task) => {
     const li = document.createElement("li");
     li.className = `task-item ${task.completed ? "completed" : ""}`;
     li.dataset.id = task.id;
@@ -122,11 +129,7 @@ function renderTasks() {
   // TODO (Fitur #5 - Counter):
   // Update elemen #task-counter di sini setiap kali renderTasks() dipanggil,
   // isinya jumlah task yang belum selesai. Contoh: "3 task tersisa".
-  const counter = document.getElementById("task-counter");
-  if (counter) {
-    const activeCount = tasks.filter((t) => !t.completed).length;
-    counter.textContent = `${activeCount} task tersisa`;
-  }
+  
 
   // TODO (Fitur #4 - Simpan ke localStorage):
   // Setiap kali renderTasks() dipanggil, data "tasks" sudah berubah,
