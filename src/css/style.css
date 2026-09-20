@@ -62,6 +62,34 @@ h1 {
   Tambahkan style untuk .filters dan .filter-btn di sini.
   Tandai tombol filter yang sedang aktif, misalnya dengan class ".active".
 */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b5563;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.filter-btn:hover {
+  background: #f3f4f6;
+}
+
+.filter-btn.active {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #ffffff;
+  font-weight: 600;
+  
 
 .task-list {
   list-style: none;
@@ -91,6 +119,7 @@ h1 {
   background: transparent;
   color: #ef4444;
   font-size: 1.1rem;
+  font-weight: bold;
   cursor: pointer;
   line-height: 1;
 }
@@ -112,12 +141,74 @@ h1 {
   pada .task-item yang membuat teksnya dicoret (text-decoration: line-through)
   dan warnanya lebih pudar.
 */
+.task-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #4f46e5;
+}
+
+.task-item.completed span {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
 
 /*
   TODO (Fitur #2 - Edit Task):
   Tambahkan style untuk mode edit, misalnya input text yang muncul
   menggantikan <span> saat task sedang diedit.
 */
+.task-item .edit-btn {
+  border: none;
+  background: transparent;
+  color: #4f46e5;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.task-item .edit-btn:hover {
+  color: #4338ca;
+}
+
+.task-item .save-btn {
+  border: none;
+  background: transparent;
+  color: #10b981;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.task-item .save-btn:hover {
+  color: #059669;
+}
+
+.task-item .edit-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #4f46e5;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.task-item .cancel-btn {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.task-item .edit-input:focus {
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
 
 /*
   TODO (Fitur #5 & #6 - Counter & Clear Completed):

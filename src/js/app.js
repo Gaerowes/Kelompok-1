@@ -13,20 +13,41 @@ const taskList = document.getElementById("task-list");
 // dipakai di mana pun. Itu tugas kamu di Fitur #1.
 let tasks = [];
 let nextId = 1;
+let currentFilter = "all";
 
 // TODO (Fitur #4 - Simpan ke localStorage):
-// Saat aplikasi pertama kali dibuka, load "tasks" dari localStorage
-// (kalau ada) sebelum renderTasks() dipanggil pertama kali di bawah.
-// Hint: gunakan JSON.parse(localStorage.getItem("tasks")) dan cek
-// null-nya sebelum dipakai.
+const savedTasks = localStorage.getItem("tasks");
+
+if (savedTasks !== null) {
+  tasks = JSON.parse(savedTasks);
+  nextId = Math.max(...tasks.map((task) => task.id), 0) + 1;
+}
 
 function renderTasks() {
   taskList.innerHTML = "";
 
-  if (tasks.length === 0) {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  //fitur 3: render tasks
+  const filteredTasks = tasks.filter((task) => {
+    if (currentFilter === "active") return !task.completed;
+    if (currentFilter === "completed") return task.completed;
+    return true;
+  });
+
+  const counter = document.getElementById("task-counter");
+  if (counter) {
+    const activeCount = tasks.filter((t) => !t.completed).length;
+    counter.textContent = `${activeCount} task tersisa`;
+  }
+
+  if (filteredTasks.length === 0) {
     const emptyState = document.createElement("li");
     emptyState.className = "empty-state";
-    emptyState.textContent = "Belum ada task. Tambahkan satu di atas!";
+    emptyState.textContent =
+      tasks.length === 0
+        ? "Belum ada task. Tambahkan satu di atas!"
+        : "Tidak ada task pada filter ini.";
     taskList.appendChild(emptyState);
     return;
   }
@@ -34,30 +55,73 @@ function renderTasks() {
   // TODO (Fitur #3 - Filter Task):
   // Sebelum di-loop, filter dulu "tasks" sesuai filter aktif
   // (semua / aktif / selesai). Sekarang semua task selalu ditampilkan.
-  tasks.forEach((task) => {
+  filteredTasks.forEach((task) => {
     const li = document.createElement("li");
-    li.className = "task-item";
+    li.className = `task-item ${task.completed ? "completed" : ""}`;
     li.dataset.id = task.id;
 
     // TODO (Fitur #1 - Tandai Selesai):
     // Tambahkan <input type="checkbox"> di sini yang mencerminkan
     // task.completed, dan tambahkan class "completed" pada `li`
     // kalau task.completed === true.
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.className = "task-checkbox";
+    checkbox.addEventListener("change", () => toggleComplete(task.id));
 
     const span = document.createElement("span");
+    li.appendChild(checkbox);
     span.textContent = task.text;
 
     // TODO (Fitur #2 - Edit Task):
-    // Tambahkan tombol "Edit" di sini. Saat diklik, ganti `span`
-    // menjadi <input> berisi teks task supaya bisa diubah,
-    // lalu simpan perubahannya saat user menekan Enter / klik Save.
+    const editBtn = document.createElement("button");
+    editBtn.className = "edit-btn";
+    editBtn.textContent = "✎";
+    editBtn.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = task.text;
+      input.className = "edit-input";
+      li.replaceChild(input, span);
+      input.focus();
+
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "save-btn";
+      saveBtn.textContent = "✓";
+      li.replaceChild(saveBtn, editBtn);
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "cancel-btn";
+      cancelBtn.textContent = "✕";
+      li.replaceChild(cancelBtn, deleteBtn);
+
+      const handleSave = () => {
+        editTask(task.id, input.value);
+      };
+
+      cancelBtn.addEventListener("click", () => {
+        renderTasks();
+      });
+
+      saveBtn.addEventListener("click", handleSave);
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          editTask(task.id, input.value);
+        } else if (event.key === "Escape") {
+          renderTasks();
+        }
+      })
+    });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
+    deleteBtn.textContent = "🗑︎";
     deleteBtn.addEventListener("click", () => deleteTask(task.id));
 
     li.appendChild(span);
+    li.appendChild(editBtn);
     li.appendChild(deleteBtn);
     taskList.appendChild(li);
   });
@@ -65,6 +129,7 @@ function renderTasks() {
   // TODO (Fitur #5 - Counter):
   // Update elemen #task-counter di sini setiap kali renderTasks() dipanggil,
   // isinya jumlah task yang belum selesai. Contoh: "3 task tersisa".
+  
 
   // TODO (Fitur #4 - Simpan ke localStorage):
   // Setiap kali renderTasks() dipanggil, data "tasks" sudah berubah,
@@ -93,21 +158,61 @@ function deleteTask(id) {
 // TODO (Fitur #1 - Tandai Selesai):
 // Buat function toggleComplete(id) yang membalik nilai task.completed
 // untuk task dengan id yang cocok, lalu panggil renderTasks().
+function toggleComplete(id) {
+  tasks = tasks.map((task) => {
+    if (task.id === id) {
+      return { ...task, completed: !task.completed };
+    }
+    return task;
+  });
+  renderTasks();
+}
 
 // TODO (Fitur #2 - Edit Task):
 // Buat function editTask(id, newText) yang mengubah task.text
 // untuk task dengan id yang cocok, lalu panggil renderTasks().
+function editTask(id, newText) {
+  const trimmed = newText.trim();
+  if (trimmed === "") {
+    renderTasks();
+    return;
+  }
+
+  const targetTask = tasks.find((t) => t.id === id);
+  if (targetTask) {
+    targetTask.text = trimmed;
+    renderTasks();
+  }
+}
 
 // TODO (Fitur #6 - Clear Completed):
-// Buat function clearCompleted() yang menghapus semua task dengan
-// completed === true dari array "tasks", lalu panggil renderTasks().
-// Jangan lupa tambahkan event listener untuk tombol #clear-completed.
+function clearCompleted() {
+  tasks = tasks.filter((task) => !task.completed);
+  renderTasks();
+}
+const clearCompletedBtn = document.getElementById("clear-completed");
+
+clearCompletedBtn.addEventListener("click", clearCompleted);
 
 // TODO (Fitur #3 - Filter Task):
 // Simpan filter yang sedang aktif di sebuah variabel, misalnya
 // `let currentFilter = "all";`, lalu tambahkan event listener untuk
 // setiap .filter-btn yang mengubah currentFilter dan memanggil
 // renderTasks() ulang.
+// Fitur #3 - Filter Task: event listener tombol filter
+const filterButtons = document.querySelectorAll(".filter-btn");
+
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+
+    // Tandai tombol yang aktif
+    filterButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    renderTasks();
+  });
+});
 
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
